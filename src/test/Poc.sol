@@ -85,7 +85,6 @@ interface InotVerified {
 
 }
 
-// forge test --fork-url https://speedy-nodes-nyc.moralis.io/a1bbad1fb914baf98fa7891b/bsc/mainnet/archive  --fork-block-number  16886438  -vvv
 contract ContractTest is DSTest {
 
     IWBNB  wbnb = IWBNB(payable(0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c));
