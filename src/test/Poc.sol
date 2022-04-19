@@ -139,8 +139,11 @@ contract ContractTest is DSTest {
 
 
     function pancakeCall(address sender, uint amount0, uint amount1, bytes calldata data) external{
-
+        // 黄色的warning 太恶心
+        sender;
         data;
+        amount0;
+        amount1;
 
         if(msg.sender == BUSDT_WBNB_Pair){
 
